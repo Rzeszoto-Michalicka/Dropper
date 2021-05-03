@@ -6,6 +6,7 @@ from pygame import mixer
 
 #Zapnutie pygame
 pygame.init()
+gameStart = 1
 
 #Obrazovka
 screenX = 800
@@ -43,7 +44,8 @@ hashtag = pygame.image.load("hashtag.png")
 
 #Zvuky
 pygame.mixer.init()
-stellar = pygame.mixer.music.load("stellar.wav")
+stellar = pygame.mixer.music.load("Hudba\stellar.wav")
+pygame.mixer.music.set_volume(0.25)
 
 #Skóre
 font = pygame.font.Font('freesansbold.ttf', 32)
@@ -72,7 +74,6 @@ for i in range(numOfFriends):
     friendYchange.append(0.25)
     friendY.append(friendlySpawn)
     friendlySpawn -= 300
-print(friendX)
 
 #Enemy
 spawnEnemy = [60, 160, 260, 360, 460, 560, 660, 650]
@@ -90,7 +91,6 @@ for j in range(numOfEnemies):
     enemyYchange.append(0.25)
     enemyY.append(enemySpawn)
     enemySpawn -= 300
-print(enemyX)
 
 #Funkcie
 def player(x, y):
@@ -113,6 +113,74 @@ def isCollisionEnemy(playerY, enemyY, enemyX):
         return True
     if playerY == enemyY[j] and enemyX[j] not in range(playerX-55, playerX+55):
         return False
+
+def start():
+    global playerX
+    global playerY
+    global playerXchange
+    global playerYchange
+    global score_value
+    global lives
+    global spawnFriend
+    global friendlyList
+    global friendlyIMG 
+    global friendX
+    global friendYchange
+    global friendY
+    global numOfFriends
+    global friendlySpawn
+    global spawnEnemy
+    global enemyList
+    global enemyIMG
+    global enemyX
+    global enemyYchange
+    global enemyY
+    global numOfEnemies
+    global enemySpawn
+    global gameStart
+    if gameStart == 1:
+        #Hráč
+        playerX = 370
+        playerY = 535
+        playerXchange = 0
+        playerYchange = 0
+        score_value = 0
+        lives = 3
+
+        #Friend
+        spawnFriend = [10, 110, 210, 310, 410, 510, 610, 710]
+        friendlyList = [zero, one]
+        friendlyIMG = []
+        friendX = []
+        friendYchange = []
+        friendY = []
+        numOfFriends = 2
+        friendlySpawn = 0
+
+    for i in range(numOfFriends):
+        friendlyIMG.append(random.choice(friendlyList))
+        friendX.append(random.choice(spawnFriend))
+        friendYchange.append(0.25)
+        friendY.append(friendlySpawn)
+        friendlySpawn -= 300
+
+    if gameStart == 1:
+        #Enemy
+        spawnEnemy = [60, 160, 260, 360, 460, 560, 660, 650]
+        enemyList = [curlyL, curlyR, hashtag]
+        enemyIMG = []
+        enemyX = []
+        enemyYchange = []
+        enemyY = []
+        enemySpawn = -150
+        gameStart = 2
+
+    for j in range(numOfEnemies):
+        enemyIMG.append(random.choice(enemyList))
+        enemyX.append(random.choice(spawnEnemy))
+        enemyYchange.append(0.25)
+        enemyY.append(enemySpawn)
+        enemySpawn -= 300
 
 
 #Loop celej hry
@@ -145,7 +213,8 @@ pygame.mixer.music.play(-1)
 while run: 
 
     screen.fill((0, 0, 0))
-
+    
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -160,6 +229,16 @@ while run:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 playerXchange = 0
 
+    if gameStart == 1:
+        numOfEnemies = 2
+        start()
+    if gameStart == 2:
+        if score_value > 10:
+            numOfEnemies = 3
+        if score_value > 20:
+            numOfEnemies = 4
+        start()    
+    
     #Friend pohyb
     for i in range(numOfFriends):
         friendY[i] += friendYchange[i]
@@ -180,7 +259,8 @@ while run:
     elif lives == 1:
         screen.blit(heart1, (750, 0))
     elif lives < 1:
-        run = False                   
+        gameStart = 1
+        run = False                  
 
     #Kolízia friends
     for i in range(numOfFriends):
@@ -228,7 +308,8 @@ while run:
 
     score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
     screen.blit(score, (350, 0))
-    
+
+
     pygame.display.update()
 
     while game == True and run == False:
@@ -242,47 +323,8 @@ while run:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 print("newgame")
                 run = True
-                #Hráč
-                playerX = 370
-                playerY = 535
-                playerXchange = 0
-                playerYchange = 0
-                score_value = 0
-                lives = 3
-
-                #Friend
-                spawnFriend = [10, 110, 210, 310, 410, 510, 610, 710]
-                friendlyList = [zero, one]
-                friendlyIMG = []
-                friendX = []
-                friendYchange = []
-                friendY = []
-                numOfFriends = 2
-                friendlySpawn = 0
-
-                for i in range(numOfFriends):
-                    friendlyIMG.append(random.choice(friendlyList))
-                    friendX.append(random.choice(spawnFriend))
-                    friendYchange.append(0.25)
-                    friendY.append(friendlySpawn)
-                    friendlySpawn -= 300
-
-                #Enemy
-                spawnEnemy = [60, 160, 260, 360, 460, 560, 660, 650]
-                enemyList = [curlyL, curlyR, hashtag]
-                enemyIMG = []
-                enemyX = []
-                enemyYchange = []
-                enemyY = []
-                numOfEnemies = 2
-                enemySpawn = -150
-
-                for j in range(numOfEnemies):
-                    enemyIMG.append(random.choice(enemyList))
-                    enemyX.append(random.choice(spawnEnemy))
-                    enemyYchange.append(0.25)
-                    enemyY.append(enemySpawn)
-                    enemySpawn -= 300
+                
+                start()
         elif mouse[0] not in range(282, 518) and mouse[1] not in range(210, 318):
             button_newgame = newgame1
         
