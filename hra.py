@@ -44,11 +44,19 @@ hashtag = pygame.image.load("hashtag.png")
 
 #Zvuky
 pygame.mixer.init()
-stellar = pygame.mixer.music.load("Hudba\stellar.wav")
+stellar = pygame.mixer.music.load("stellar.wav")
 pygame.mixer.music.set_volume(0.25)
 
-#Skóre
+#Font
 font = pygame.font.Font('freesansbold.ttf', 32)
+base_font = pygame.font.Font(None, 32)
+
+#Login
+user_text = ''
+input_rect = pygame.Rect(200, 200, 140, 32)
+color_active = pygame.Color('lightskyblue3')
+color_passive = pygame.Color('chartreuse4')
+color = color_passive
 
 #Hráč
 playerX = 370
@@ -187,6 +195,7 @@ def start():
 run = True
 game = True
 menu = True
+active = False
 while menu:
     
     screen.fill((0, 0, 0))
@@ -196,7 +205,19 @@ while menu:
             run = False
             game = False
             menu = False
-    
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if input_rect.collidepoint(event.pos):
+                active = True
+            else:
+                active = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_BACKSPACE:
+                user_text = user_text[:-1]
+            else:
+                user_text += event.unicode
+
     screen.blit(menuIMG, (0,0))
     screen.blit(play, (320, 260))
     mouse = pygame.mouse.get_pos()
@@ -206,6 +227,16 @@ while menu:
             menu = False
     elif mouse[0] not in range(320, 470) or mouse[1] not in range(260, 360):
         play = play1
+    
+    if active == True:
+        color = color_active
+    else:
+        color = color_passive
+    pygame.draw.rect(screen, color, input_rect)
+    text_surface = base_font.render(user_text, True, (255, 255, 255))
+    screen.blit(text_surface, (input_rect.x+5, input_rect.y+5))
+    input_rect.w = max(100, text_surface.get_width()+10)
+    
     pygame.display.update()  
 
 pygame.mixer.music.play(-1)
@@ -219,15 +250,17 @@ while run:
         if event.type == pygame.QUIT:
             run = False
             game = False
+    
     #Pohyb
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_LEFT:
                 playerXchange = -1
-            if event.key == pygame.K_RIGHT:
+        if event.key == pygame.K_RIGHT:
                 playerXchange = +1
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                playerXchange = 0
+    if event.type == pygame.KEYUP:
+        if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+            playerXchange = 0
+
 
     if gameStart == 1:
         numOfEnemies = 2
