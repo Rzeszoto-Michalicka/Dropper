@@ -2,11 +2,22 @@ import pygame
 import random
 import sys
 from pygame import mixer
+import json
 
 
 #Zapnutie pygame
 pygame.init()
 gameStart = 1
+login_data = {
+    "nikos":1,
+    "minerxx91":1,
+}
+try:
+    with open("login_data.txt") as login_data_load:
+        login_data = json.load(login_data_load)
+    print(login_data)
+except:
+    print("No file created yet")
 
 #Obrazovka
 screenX = 800
@@ -41,6 +52,12 @@ play1 = pygame.image.load("play1.png")
 play2 = pygame.image.load("play2.png")
 play = play1
 hashtag = pygame.image.load("hashtag.png")
+endless1 = pygame.image.load("mod_endless1.png")
+endless2 = pygame.image.load("mod_endless2.png")
+button_endless = endless2
+levels1 = pygame.image.load("mod_levels1.png")
+levels2 = pygame.image.load("mod_levels2.png")
+button_levels = levels2
 
 #Zvuky
 pygame.mixer.init()
@@ -51,7 +68,7 @@ pygame.mixer.music.set_volume(0.25)
 font = pygame.font.Font('freesansbold.ttf', 32)
 base_font = pygame.font.Font(None, 32)
 
-#Login
+#Input pole
 user_text = ''
 input_rect = pygame.Rect(200, 200, 140, 32)
 color_active = pygame.Color('lightskyblue3')
@@ -192,6 +209,7 @@ def start():
 
 
 #Loop celej hry
+decision = True
 run = True
 game = True
 menu = True
@@ -202,6 +220,8 @@ while menu:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            with open("login_data.txt", "w") as login_data_write:
+                json.dump(login_data,login_data_write)
             run = False
             game = False
             menu = False
@@ -212,18 +232,23 @@ while menu:
             else:
                 active = False
 
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN and active == True:
             if event.key == pygame.K_BACKSPACE:
                 user_text = user_text[:-1]
             else:
                 user_text += event.unicode
+            if event.key == pygame.K_KP_ENTER:
+                user_text = user_text[:-1]
 
+    
     screen.blit(menuIMG, (0,0))
     screen.blit(play, (320, 260))
     mouse = pygame.mouse.get_pos()
     if mouse[0] in range(320, 470) and mouse[1] in range(260,360):
         play = play2
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and user_text != "":
+            login_data[user_text] = "1"
+            print(login_data)
             menu = False
     elif mouse[0] not in range(320, 470) or mouse[1] not in range(260, 360):
         play = play1
@@ -239,6 +264,39 @@ while menu:
     
     pygame.display.update()  
 
+
+
+while decision:
+    screen.fill((0, 0, 0))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            with open("login_data.txt", "w") as login_data_write:
+                json.dump(login_data,login_data_write)
+            run = False
+            game = False
+            menu = False
+            decision = False
+
+    screen.blit(end, (0, 0))
+    screen.blit(button_endless, (450,200))
+    screen.blit(button_levels, (150,200))
+    mouse = pygame.mouse.get_pos()
+    if mouse[0] in range(450, 650) and mouse[1] in range(200,400):
+        button_endless = endless1
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            decision = False         
+    else:
+        button_endless = endless2 
+
+    if mouse[0] in range(150, 350) and mouse[1] in range(200,400):
+        button_levels = levels1         
+    else:
+        button_levels = levels2 
+
+
+
+    pygame.display.update()
+
 pygame.mixer.music.play(-1)
 
 while run: 
@@ -248,6 +306,8 @@ while run:
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            with open("login_data.txt", "w") as login_data_write:
+                json.dump(login_data,login_data_write)
             run = False
             game = False
     
@@ -371,6 +431,8 @@ while run:
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                    game = False
-                    run = False
+                with open("login_data.txt", "w") as login_data_write:
+                    json.dump(login_data,login_data_write)    
+                game = False
+                run = False
         pygame.display.update()
