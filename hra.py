@@ -3,20 +3,33 @@ import random
 import sys
 from pygame import mixer
 import json
+import time
 
 
 #Zapnutie pygame
 pygame.init()
 gameStart = 1
 login_data = {
-
+    "quess":1
 }
+
+leaderboard_data = {
+    "quess":0
+}
+
 try:
     with open("login_data.txt") as login_data_load:
         login_data = json.load(login_data_load)
     print(login_data)
 except:
-    print("No file created yet")
+    print("No login file created yet")
+
+try:
+    with open("leaderboard_data.txt") as leaderboard_data_load:
+        leaderboard_data = json.load(leaderboard_data_load)
+    print(leaderboard_data)
+except:
+    print("No leaderboard file created yet")
 
 #Obrazovka
 screenX = 800
@@ -57,6 +70,12 @@ button_endless = endless2
 levels1 = pygame.image.load("mod_levels1.png")
 levels2 = pygame.image.load("mod_levels2.png")
 button_levels = levels2
+leaderboard1 = pygame.image.load("leaderboard1.png")
+leaderboard2 = pygame.image.load("leaderboard2.png")
+button_leaderboard = leaderboard2
+back1 = pygame.image.load("back1.png")
+back2 = pygame.image.load("back2.png")
+button_back = back2
 
 #Zvuky
 pygame.mixer.init()
@@ -214,6 +233,9 @@ run = True
 game = True
 menu = True
 active = False
+leaderboard = False
+setup = True
+
 while menu:
     
     screen.fill((0, 0, 0))
@@ -222,10 +244,7 @@ while menu:
         if event.type == pygame.QUIT:
             with open("login_data.txt", "w") as login_data_write:
                 json.dump(login_data,login_data_write)
-            run = False
-            game = False
-            menu = False
-            decision = False
+            pygame.quit()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if input_rect.collidepoint(event.pos):
@@ -268,175 +287,210 @@ while menu:
     
     pygame.display.update()  
 
+while setup:
 
-
-while decision:
-    screen.fill((0, 0, 0))
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            with open("login_data.txt", "w") as login_data_write:
-                json.dump(login_data,login_data_write)
-            run = False
-            game = False
-            menu = False
-            decision = False
-
-    screen.blit(end, (0, 0))
-    screen.blit(button_endless, (450,200))
-    screen.blit(button_levels, (150,200))
-    mouse = pygame.mouse.get_pos()
-    if mouse[0] in range(450, 650) and mouse[1] in range(200,400):
-        button_endless = endless1
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            decision = False         
-    else:
-        button_endless = endless2 
-
-    if mouse[0] in range(150, 350) and mouse[1] in range(200,400):
-        button_levels = levels1         
-    else:
-        button_levels = levels2 
-
-
-
-    pygame.display.update()
-
-pygame.mixer.music.play(-1)
-
-while run: 
-
-    screen.fill((0, 0, 0))
-    
-    
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            with open("login_data.txt", "w") as login_data_write:
-                json.dump(login_data,login_data_write)
-            run = False
-            game = False
-    
-    #Pohyb
-    if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_LEFT:
-                playerXchange = -1
-        if event.key == pygame.K_RIGHT:
-                playerXchange = +1
-    if event.type == pygame.KEYUP:
-        if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-            playerXchange = 0
-
-
-    if gameStart == 1:
-        numOfEnemies = 2
-        start()
-    if gameStart == 2:
-        if score_value > 10:
-            numOfEnemies = 3
-        if score_value > 20:
-            numOfEnemies = 4
-        start()    
-    
-    #Friend pohyb
-    for i in range(numOfFriends):
-        friendY[i] += friendYchange[i]
-    
-    #Enemy pohyb
-    for j in range(numOfEnemies):
-        enemyY[j] += enemyYchange[j]
-    
-    screen.blit(background, (0, 0))
-    
-    if lives == 3:
-        screen.blit(heart1, (750, 0))
-        screen.blit(heart2, (715, 0))
-        screen.blit(heart3, (680, 0))
-    elif lives == 2:
-        screen.blit(heart1, (750, 0))
-        screen.blit(heart2, (715, 0))
-    elif lives == 1:
-        screen.blit(heart1, (750, 0))
-    elif lives < 1:
-        gameStart = 1
-        run = False                  
-
-    #Kolízia friends
-    for i in range(numOfFriends):
-        
-        collisionFriends = isCollisionFriends(playerY, friendY, friendX)
-        if collisionFriends == True:
-            friendX[i] = (random.choice(spawnFriend))
-            friendY[i] = 0
-            score_value += 1
-            print("boom")
-            friendlyIMG[i] = random.choice(friendlyList)
-        if collisionFriends == False:
-            friendX[i] = (random.choice(spawnFriend))
-            friendY[i] = 0
-            lives -= 1
-            print("vedla")
-            friendlyIMG[i] = random.choice(friendlyList)
-
-    #Kolízia enemies
-    for j in range(numOfEnemies):
-        
-        collisionEnemy = isCollisionEnemy(playerY, enemyY, enemyX)
-        if collisionEnemy == True:
-            enemyX[j] = (random.choice(spawnEnemy))
-            enemyY[j] = 0
-            lives -= 1
-            print("zasah")
-            enemyIMG[j] = random.choice(enemyList)
-        if collisionEnemy == False:
-            enemyX[j] = (random.choice(spawnEnemy))
-            enemyY[j] = 0            
-            enemyIMG[j] = random.choice(enemyList)    
-
-
-    playerX += playerXchange
-    for i in range(numOfFriends):
-        friend(friendX[i], friendY[i])
-    for j in range(numOfEnemies):
-        enemy(enemyX[j], enemyY[j])
-    player(playerX, playerY)
-    if playerX <= 0:
-        playerX = 0
-    elif playerX >= 736:
-        playerX = 736
-
-    score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
-    screen.blit(score, (350, 0))
-
-
-    pygame.display.update()
-
-    while game == True and run == False:
+    while decision:
+        screen.fill((0, 0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                with open("login_data.txt", "w") as login_data_write:
+                    json.dump(login_data,login_data_write)
+                pygame.quit()
         screen.blit(end, (0, 0))
-        screen.blit(button_newgame, (272,200))
-        screen.blit(button_quit, (272,400))
-        screen.blit(gameover, (144,0))
+        screen.blit(button_endless, (450,200))
+        screen.blit(button_levels, (150,200))
+        screen.blit(button_leaderboard, (300,450))
         mouse = pygame.mouse.get_pos()
-        if mouse[0] in range(282, 518)  and mouse[1] in range(210, 318):
-            button_newgame = newgame2
+        if mouse[0] in range(450, 650) and mouse[1] in range(200,400):
+            button_endless = endless1
             if event.type == pygame.MOUSEBUTTONDOWN:
-                print("newgame")
-                run = True
-                
-                start()
-        elif mouse[0] not in range(282, 518) and mouse[1] not in range(210, 318):
-            button_newgame = newgame1
-        
-        if mouse[0] in range(282, 518)  and mouse[1] in range(410, 518):
-            button_quit = quit2
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                game = False
-                run = False
+                decision = False   
+                run = True  
+                leaderboard = False    
         else:
-            button_quit = quit1
+            button_endless = endless2 
+
+        if mouse[0] in range(150, 350) and mouse[1] in range(200,400):
+            button_levels = levels1         
+        else:
+            button_levels = levels2 
+
+        if mouse[0] in range(300, 500) and mouse[1] in range(450,650):
+            button_leaderboard = leaderboard1  
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                decision = False   
+                run = False   
+                leaderboard = True     
+        else:
+            button_leaderboard = leaderboard2 
+
+        pygame.display.update()
+    time.sleep(0.1)
+    while leaderboard:
+        mouse = pygame.mouse.get_pos()
+        screen.fill((0, 0, 0))
+        screen.blit(button_back, (300,450))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                with open("login_data.txt", "w") as login_data_write:
+                    json.dump(login_data,login_data_write)
+                pygame.quit()
+
+        if mouse[0] in range(300, 500) and mouse[1] in range(450,650):
+            button_back = back1  
+            if event.type == pygame.MOUSEBUTTONDOWN: 
+                leaderboard = False 
+                decision = True
+                time.sleep(0.1)    
+        else:
+            button_back = back2 
+        pygame.display.update()
+
+    if run:    
+        pygame.mixer.music.play(-1)
+    while run: 
+
+        screen.fill((0, 0, 0))
+        
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 with open("login_data.txt", "w") as login_data_write:
-                    json.dump(login_data,login_data_write)    
-                game = False
-                run = False
+                    json.dump(login_data,login_data_write)
+                pygame.quit()
+        
+        #Pohyb
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                    playerXchange = -1
+            if event.key == pygame.K_RIGHT:
+                    playerXchange = +1
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                playerXchange = 0
+
+
+        if gameStart == 1:
+            numOfEnemies = 2
+            start()
+        if gameStart == 2:
+            if score_value > 10:
+                numOfEnemies = 3
+            if score_value > 20:
+                numOfEnemies = 4
+            start()    
+        
+        #Friend pohyb
+        for i in range(numOfFriends):
+            friendY[i] += friendYchange[i]
+        
+        #Enemy pohyb
+        for j in range(numOfEnemies):
+            enemyY[j] += enemyYchange[j]
+        
+        screen.blit(background, (0, 0))
+        
+        if lives == 3:
+            screen.blit(heart1, (750, 0))
+            screen.blit(heart2, (715, 0))
+            screen.blit(heart3, (680, 0))
+        elif lives == 2:
+            screen.blit(heart1, (750, 0))
+            screen.blit(heart2, (715, 0))
+        elif lives == 1:
+            screen.blit(heart1, (750, 0))
+        elif lives < 1:
+            try:
+                if leaderboard_data[user_text] < score_value:
+                    leaderboard_data[user_text] = score_value
+                    with open("leaderboard_data.txt", "w") as login_data_leaderboard:
+                        json.dump(leaderboard_data, login_data_leaderboard)
+            except:
+                leaderboard_data[user_text] = score_value
+                with open("leaderboard_data.txt", "w") as login_data_leaderboard:
+                    json.dump(leaderboard_data, login_data_leaderboard)
+            gameStart = 1
+            run = False                  
+
+        #Kolízia friends
+        for i in range(numOfFriends):
+            
+            collisionFriends = isCollisionFriends(playerY, friendY, friendX)
+            if collisionFriends == True:
+                friendX[i] = (random.choice(spawnFriend))
+                friendY[i] = 0
+                score_value += 1
+                print("boom")
+                friendlyIMG[i] = random.choice(friendlyList)
+            if collisionFriends == False:
+                friendX[i] = (random.choice(spawnFriend))
+                friendY[i] = 0
+                lives -= 1
+                print("vedla")
+                friendlyIMG[i] = random.choice(friendlyList)
+
+        #Kolízia enemies
+        for j in range(numOfEnemies):
+            
+            collisionEnemy = isCollisionEnemy(playerY, enemyY, enemyX)
+            if collisionEnemy == True:
+                enemyX[j] = (random.choice(spawnEnemy))
+                enemyY[j] = 0
+                lives -= 1
+                print("zasah")
+                enemyIMG[j] = random.choice(enemyList)
+            if collisionEnemy == False:
+                enemyX[j] = (random.choice(spawnEnemy))
+                enemyY[j] = 0            
+                enemyIMG[j] = random.choice(enemyList)    
+
+
+        playerX += playerXchange
+        for i in range(numOfFriends):
+            friend(friendX[i], friendY[i])
+        for j in range(numOfEnemies):
+            enemy(enemyX[j], enemyY[j])
+        player(playerX, playerY)
+        if playerX <= 0:
+            playerX = 0
+        elif playerX >= 736:
+            playerX = 736
+
+        score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
+        screen.blit(score, (350, 0))
+
+
         pygame.display.update()
+
+        while game == True and run == False and decision == False:
+            screen.blit(end, (0, 0))
+            screen.blit(button_newgame, (272,200))
+            screen.blit(button_quit, (272,400))
+            screen.blit(gameover, (144,0))
+            mouse = pygame.mouse.get_pos()
+            if mouse[0] in range(282, 518)  and mouse[1] in range(210, 318):
+                button_newgame = newgame2
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    print("newgame")
+                    run = True
+                    
+                    start()
+            elif mouse[0] not in range(282, 518) and mouse[1] not in range(210, 318):
+                button_newgame = newgame1
+            
+            if mouse[0] in range(282, 518)  and mouse[1] in range(410, 518):
+                button_quit = quit2
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    game = False
+                    run = False
+                    pygame.quit()
+            else:
+                button_quit = quit1
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    with open("login_data.txt", "w") as login_data_write:
+                        json.dump(login_data,login_data_write)
+                    game = False    
+                    pygame.quit()
+            pygame.display.update()
