@@ -9,8 +9,7 @@ import json
 pygame.init()
 gameStart = 1
 login_data = {
-    "nikos":1,
-    "minerxx91":1,
+
 }
 try:
     with open("login_data.txt") as login_data_load:
@@ -70,7 +69,7 @@ base_font = pygame.font.Font(None, 32)
 
 #Input pole
 user_text = ''
-input_rect = pygame.Rect(200, 200, 140, 32)
+input_rect = pygame.Rect(345, 200, 140, 32)
 color_active = pygame.Color('lightskyblue3')
 color_passive = pygame.Color('chartreuse4')
 color = color_passive
@@ -96,9 +95,10 @@ friendlySpawn = 0
 for i in range(numOfFriends):
     friendlyIMG.append(random.choice(friendlyList))
     friendX.append(random.choice(spawnFriend))
-    friendYchange.append(0.25)
+    friendYchange.append(random.choice([0.2, 0.25, 0.3]))
     friendY.append(friendlySpawn)
     friendlySpawn -= 300
+    print(friendYchange)
 
 #Enemy
 spawnEnemy = [60, 160, 260, 360, 460, 560, 660, 650]
@@ -113,7 +113,7 @@ enemySpawn = -150
 for j in range(numOfEnemies):
     enemyIMG.append(random.choice(enemyList))
     enemyX.append(random.choice(spawnEnemy))
-    enemyYchange.append(0.25)
+    enemyYchange.append(random.choice([0.2, 0.25, 0.3]))
     enemyY.append(enemySpawn)
     enemySpawn -= 300
 
@@ -128,15 +128,15 @@ def enemy(x, y):
     screen.blit(enemyIMG[j], (x, y))
 
 def isCollisionFriends(playerY, friendY, friendX):
-    if playerY == friendY[i] and friendX[i] in range(playerX-60, playerX+60):
+    if (friendY[i] > playerY and friendY[i] < playerY + 10) and friendX[i] in range(playerX-60, playerX+60):
         return True
-    if playerY == friendY[i] and friendX[i] not in range(playerX-60, playerX+60):
+    if (friendY[i] > playerY) and friendX[i] not in range(playerX-60, playerX+60):
         return False
 
 def isCollisionEnemy(playerY, enemyY, enemyX):
-    if playerY == enemyY[j] and enemyX[j] in range(playerX-55, playerX+55):
+    if (enemyY[i] > playerY and enemyY[i] < playerY + 10) and enemyX[j] in range(playerX-55, playerX+55):
         return True
-    if playerY == enemyY[j] and enemyX[j] not in range(playerX-55, playerX+55):
+    if (enemyY[i] > playerY) and enemyX[j] not in range(playerX-55, playerX+55):
         return False
 
 def start():
@@ -185,7 +185,7 @@ def start():
     for i in range(numOfFriends):
         friendlyIMG.append(random.choice(friendlyList))
         friendX.append(random.choice(spawnFriend))
-        friendYchange.append(0.25)
+        friendYchange.append(random.choice([0.2, 0.25, 0.3]))
         friendY.append(friendlySpawn)
         friendlySpawn -= 300
 
@@ -203,7 +203,7 @@ def start():
     for j in range(numOfEnemies):
         enemyIMG.append(random.choice(enemyList))
         enemyX.append(random.choice(spawnEnemy))
-        enemyYchange.append(0.25)
+        enemyYchange.append(random.choice([0.2, 0.25, 0.3]))
         enemyY.append(enemySpawn)
         enemySpawn -= 300
 
@@ -225,6 +225,7 @@ while menu:
             run = False
             game = False
             menu = False
+            decision = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if input_rect.collidepoint(event.pos):
@@ -247,8 +248,11 @@ while menu:
     if mouse[0] in range(320, 470) and mouse[1] in range(260,360):
         play = play2
         if event.type == pygame.MOUSEBUTTONDOWN and user_text != "":
-            login_data[user_text] = "1"
-            print(login_data)
+            try:
+                if login_data[user_text] > 1:
+                    print(login_data)
+            except:
+                login_data[user_text] = 1
             menu = False
     elif mouse[0] not in range(320, 470) or mouse[1] not in range(260, 360):
         play = play1
