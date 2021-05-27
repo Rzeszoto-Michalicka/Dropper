@@ -314,13 +314,13 @@ while menu:
 while setup:
 
     while decision:
-        level = (login_data[user_text])
         screen.fill((0, 0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 with open("login_data.txt", "w") as login_data_write:
                     json.dump(login_data,login_data_write)
                 pygame.quit()
+        level = int(login_data[str(user_text)])
         screen.blit(end, (0, 0))
         screen.blit(button_endless, (450,200))
         screen.blit(button_levels, (150,200))
@@ -407,9 +407,10 @@ while setup:
             numOfEnemies = 0
             start()
         if gameStart == 2:
-            if score_value >= 10:
+            if score_value >= 1:
                 level = 2
-                break
+                decision = True
+                levelOne = False
             start()  
         
         #Friend pohyb
