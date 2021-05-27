@@ -4,7 +4,7 @@ import sys
 from pygame import mixer
 import json
 import time
-
+import collections
 
 #Zapnutie pygame
 pygame.init()
@@ -30,6 +30,25 @@ try:
     print(leaderboard_data)
 except:
     print("No leaderboard file created yet")
+
+Login_best = collections.namedtuple('Login_best', 'score name')
+login_data_best = sorted([Login_best(v,k) for (k,v) in login_data.items()], reverse=True)
+login_best = login_data_best[0]
+#print(login_best)
+#print(login_best.name)
+#print(login_best.score)
+
+Leaderboard_best = collections.namedtuple('Leaderboard_best', 'score name')
+leaderboard_data_best = sorted([Leaderboard_best(v,k) for (k,v) in leaderboard_data.items()], reverse=True)
+for i in range(5):
+    try:
+        leaderboard_best = leaderboard_data_best[i]
+        print(leaderboard_best)
+        print(leaderboard_best.name)
+        print(leaderboard_best.score)
+    except:
+        break
+color = (255, 255, 255)
 
 #Obrazovka
 screenX = 800
@@ -258,7 +277,6 @@ leaderboard = False
 setup = True
 levelOne = False
 endscreen = False
-levelTwo = False
 
 while menu:
     
@@ -309,18 +327,18 @@ while menu:
     screen.blit(text_surface, (input_rect.x+5, input_rect.y+5))
     input_rect.w = max(100, text_surface.get_width()+10)
     
-    pygame.display.update()
+    pygame.display.update()  
 
 while setup:
 
     while decision:
+        level = (login_data[user_text])
         screen.fill((0, 0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 with open("login_data.txt", "w") as login_data_write:
                     json.dump(login_data,login_data_write)
                 pygame.quit()
-        level = int(login_data[str(user_text)])
         screen.blit(end, (0, 0))
         screen.blit(button_endless, (450,200))
         screen.blit(button_levels, (150,200))
@@ -331,8 +349,7 @@ while setup:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 decision = False   
                 run = True  
-                leaderboard = False
-                menu = False
+                leaderboard = False   
         else:
             button_endless = endless2 
 
@@ -343,8 +360,6 @@ while setup:
                 decision = False
                 leaderboard = False
                 run = False
-                menu = False
-
         else:
             button_levels = levels2 
 
@@ -353,16 +368,63 @@ while setup:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 decision = False   
                 run = False   
-                leaderboard = True  
+                leaderboard = True     
         else:
             button_leaderboard = leaderboard2 
 
         pygame.display.update()
-    time.sleep(0.1)
+    time.sleep(0.13)
     while leaderboard:
         mouse = pygame.mouse.get_pos()
         screen.fill((0, 0, 0))
         screen.blit(button_back, (300,450))
+        font = pygame.font.SysFont("COPPERPLATE GOTHIC", 40, True)
+        label = font.render("Leaderboard", True, (color)) 
+        screen.blit(label, (260, 25))
+        font = pygame.font.SysFont("COPPERPLATE GOTHIC", 35, True)
+        label = font.render("Levels", True, (color)) 
+        screen.blit(label, (185, 100))
+        label = font.render("Endless", True, (color)) 
+        screen.blit(label, (480, 100))
+        font = pygame.font.SysFont("COPPERPLATE GOTHIC", 20, True)
+        for i in range(5):
+            try:
+                if i == 0:
+                    color = (201, 176, 55)
+                elif i == 1:
+                    color = (180, 180, 180)
+                elif i == 2:
+                    color = (173, 138, 86)
+                else:
+                    color = (255, 255, 255)
+                
+                leaderboard_best = leaderboard_data_best[i]
+                label = font.render(str(leaderboard_best.name), True, (color))
+                screen.blit(label, (450, 190+i*65))
+                label = font.render(str(leaderboard_best.score), True, (color))
+                screen.blit(label, (650, 190+i*65))
+            except:
+                break
+
+        for i in range(5):
+            try:
+                if i == 0:
+                    color = (201, 176, 55)
+                elif i == 1:
+                    color = (200, 200, 200)
+                elif i == 2:
+                    color = (173, 138, 86)
+                else:
+                    color = (255, 255, 255)
+
+                login_best = login_data_best[i]    
+                label = font.render(str(login_best.name), True, (color))
+                screen.blit(label, (150, 190+i*65))
+                label = font.render(str(login_best.score), True, (color))
+                screen.blit(label, (350, 190+i*65))
+            except:
+                break
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 with open("login_data.txt", "w") as login_data_write:
@@ -378,12 +440,12 @@ while setup:
         else:
             button_back = back2 
         pygame.display.update()
-
+    time.sleep(0.13)
     if run:    
         pygame.mixer.music.play(-1)
     
     while levelOne:
-        
+        decision = True
         run = False
         screen.fill((0, 0, 0))
 
@@ -404,14 +466,14 @@ while setup:
                 playerXchange = 0
 
         if gameStart == 1:
-            numOfEnemies = 0
+            numOfEnemies = 2
             start()
         if gameStart == 2:
-            if score_value >= 1:
-                level = 2
-                decision = True
-                levelOne = False
-            start()  
+            if score_value > 10:
+                numOfEnemies = 3
+            if score_value > 20:
+                numOfEnemies = 4
+            start()    
         
         #Friend pohyb
         for i in range(numOfFriends):
@@ -443,8 +505,7 @@ while setup:
                 with open("leaderboard_data.txt", "w") as login_data_leaderboard:
                     json.dump(leaderboard_data, login_data_leaderboard)
             gameStart = 1
-            levelOne = False
-            endscreen = True
+            levelOne = False  
 
 
 
@@ -560,6 +621,7 @@ while setup:
                     json.dump(leaderboard_data, login_data_leaderboard)
             gameStart = 1
             run = False                  
+            decision = True
 
         #Kolízia friends
         for i in range(numOfFriends):
