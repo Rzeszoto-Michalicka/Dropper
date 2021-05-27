@@ -258,6 +258,7 @@ leaderboard = False
 setup = True
 levelOne = False
 endscreen = False
+levelTwo = False
 
 while menu:
     
@@ -308,7 +309,7 @@ while menu:
     screen.blit(text_surface, (input_rect.x+5, input_rect.y+5))
     input_rect.w = max(100, text_surface.get_width()+10)
     
-    pygame.display.update()  
+    pygame.display.update()
 
 while setup:
 
@@ -330,7 +331,8 @@ while setup:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 decision = False   
                 run = True  
-                leaderboard = False   
+                leaderboard = False
+                menu = False
         else:
             button_endless = endless2 
 
@@ -341,6 +343,8 @@ while setup:
                 decision = False
                 leaderboard = False
                 run = False
+                menu = False
+
         else:
             button_levels = levels2 
 
@@ -349,7 +353,7 @@ while setup:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 decision = False   
                 run = False   
-                leaderboard = True     
+                leaderboard = True  
         else:
             button_leaderboard = leaderboard2 
 
@@ -400,14 +404,13 @@ while setup:
                 playerXchange = 0
 
         if gameStart == 1:
-            numOfEnemies = 2
+            numOfEnemies = 0
             start()
         if gameStart == 2:
-            if score_value > 10:
-                numOfEnemies = 3
-            if score_value > 20:
-                numOfEnemies = 4
-            start()    
+            if score_value >= 10:
+                level = 2
+                break
+            start()  
         
         #Friend pohyb
         for i in range(numOfFriends):
