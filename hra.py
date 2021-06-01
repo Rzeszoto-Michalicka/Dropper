@@ -91,6 +91,12 @@ darth = pygame.image.load("darth_wader.png").convert_alpha()
 storm = pygame.image.load("storm.png").convert_alpha()
 starwarsbackground = pygame.image.load("wars_background.png").convert_alpha()
 starwars = pygame.image.load("star_wars.png").convert_alpha()
+japanbackground = pygame.image.load("japanesebackground.png").convert_alpha()
+flag = pygame.image.load("japanflag.png").convert_alpha()
+nuke = pygame.image.load("nuclear.png").convert_alpha()
+naruto = pygame.image.load("naruto.png").convert_alpha()
+tsunami = pygame.image.load("tsunami.png").convert_alpha()
+sushi = pygame.image.load("sushi.png").convert_alpha()
 
 #Zvuky
 pygame.mixer.init()
@@ -164,6 +170,7 @@ def start():
     global gameStart
     global levelOne
     global levelTwo
+    global levelThree
     global run
     global endscreen
     global setup
@@ -181,7 +188,7 @@ def start():
 
         #Friend
         spawnFriend = [10, 110, 210, 310, 410, 510, 610, 710]
-        friendlyList = [zero, one, fish, shark, r2d2, yoda]
+        friendlyList = [zero, one, fish, shark, r2d2, yoda, naruto, sushi]
         friendlyIMG = []
         friendX = []
         friendYchange = []
@@ -208,11 +215,17 @@ def start():
             friendYchange.append(random.choice([0.2, 0.3]))
             friendY.append(friendlySpawn)
             friendlySpawn -= 300
+        elif levelThree == True:
+            friendlyIMG.append(friendlyList[(random.randrange(6,8))])
+            friendX.append(random.choice(spawnFriend))
+            friendYchange.append(random.choice([0.2, 0.3]))
+            friendY.append(friendlySpawn)
+            friendlySpawn -= 300
 
     if gameStart == 1:
         #Enemy
         spawnEnemy = [60, 160, 260, 360, 460, 560, 660, 650]
-        enemyList = [curlyL, curlyR, hashtag, bottle, oil, darth, storm]
+        enemyList = [curlyL, curlyR, hashtag, bottle, oil, darth, storm, tsunami, nuke]
         enemyIMG = []
         enemyX = []
         enemyYchange = []
@@ -239,6 +252,12 @@ def start():
             enemyYchange.append(random.choice([0.2, 0.3]))
             enemyY.append(enemySpawn)
             enemySpawn -= 300
+        elif levelThree == True:
+            enemyIMG.append(enemyList[(random.randrange(7,9))])
+            enemyX.append(random.choice(spawnEnemy))
+            enemyYchange.append(random.choice([0.2, 0.3]))
+            enemyY.append(enemySpawn)
+            enemySpawn -= 300
 
 
 #Loop celej hry
@@ -250,7 +269,7 @@ leaderboard = False
 setup = True
 levelOne = False
 levelTwo = False
-levelThree = True
+levelThree = False
 endscreen = False
 
 while menu:
@@ -337,6 +356,11 @@ while setup:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN and level == 2:
                 levelTwo = True
+                decision = False
+                leaderboard = False
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN and level == 3:
+                levelThree = True
                 decision = False
                 leaderboard = False
                 run = False
@@ -577,7 +601,7 @@ while setup:
             start()
         if gameStart == 2:
             if score_value >= 10:
-                level = 2
+                level = 3
                 login_data[user_text] = level
                 with open("login_data.txt", "w") as login_data_login:
                     json.dump(login_data, login_data_login)
@@ -670,6 +694,124 @@ while setup:
         
         pygame.display.update()
 
+    while levelThree:
+    
+        run = False
+        screen.fill((0, 0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                with open("login_data.txt", "w") as login_data_write:
+                    json.dump(login_data,login_data_write)
+                pygame.quit()
+        
+        #Pohyb
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                    playerXchange = -1
+            if event.key == pygame.K_RIGHT:
+                    playerXchange = +1
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                playerXchange = 0
+
+        if gameStart == 1:
+            numOfEnemies = 1
+            start()
+        if gameStart == 2:
+            if score_value >= 10:
+                level = 4
+                login_data[user_text] = level
+                with open("login_data.txt", "w") as login_data_login:
+                    json.dump(login_data, login_data_login)
+                decision = True
+                levelThree = False
+            start()    
+        
+        #Friend pohyb
+        for i in range(numOfFriends):
+            friendY[i] += friendYchange[i]
+        
+        #Enemy pohyb
+        for j in range(numOfEnemies):
+            enemyY[j] += enemyYchange[j]
+        
+        screen.blit(japanbackground, (0,0))
+        
+        if lives == 3:
+            screen.blit(heart1, (750, 0))
+            screen.blit(heart2, (715, 0))
+            screen.blit(heart3, (680, 0))
+        elif lives == 2:
+            screen.blit(heart1, (750, 0))
+            screen.blit(heart2, (715, 0))
+        elif lives == 1:
+            screen.blit(heart1, (750, 0))
+        elif lives < 1:
+            try:
+                if leaderboard_data[user_text] < score_value:
+                    leaderboard_data[user_text] = score_value
+                    with open("leaderboard_data.txt", "w") as login_data_leaderboard:
+                        json.dump(leaderboard_data, login_data_leaderboard)
+            except:
+                leaderboard_data[user_text] = score_value
+                with open("leaderboard_data.txt", "w") as login_data_leaderboard:
+                    json.dump(leaderboard_data, login_data_leaderboard)
+            gameStart = 1
+            levelThree = False
+            decision = True
+
+
+
+        #Kolízia friends
+        for i in range(numOfFriends):
+            
+            collisionFriends = isCollisionFriends(playerY, friendY, friendX)
+            if collisionFriends == True:
+                friendX[i] = (random.choice(spawnFriend))
+                friendY[i] = 0
+                score_value += 1
+                print("boom")
+                friendlyIMG[i] = friendlyList[(random.randrange(6, 8))]
+            if collisionFriends == False:
+                friendX[i] = (random.choice(spawnFriend))
+                friendY[i] = 0
+                lives -= 1
+                print("vedla")
+                friendlyIMG[i] = friendlyList[(random.randrange(6, 8))]
+
+        #Kolízia enemies
+        for j in range(numOfEnemies):
+            
+            collisionEnemy = isCollisionEnemy(playerY, enemyY, enemyX)
+            if collisionEnemy == True:
+                enemyX[j] = (random.choice(spawnEnemy))
+                enemyY[j] = 0
+                lives -= 1
+                print("zasah")
+                enemyIMG[j] = enemyList[(random.randrange(7, 9))]
+            if collisionEnemy == False:
+                enemyX[j] = (random.choice(spawnEnemy))
+                enemyY[j] = 0            
+                enemyIMG[j] = enemyList[(random.randrange(7, 9))]
+
+
+        playerX += playerXchange
+        for i in range(numOfFriends):
+            friend(friendX[i], friendY[i])
+        for j in range(numOfEnemies):
+            enemy(enemyX[j], enemyY[j])
+        player(playerX, playerY, flag)
+        if playerX <= 0:
+            playerX = 0
+        elif playerX >= 736:
+            playerX = 736
+
+        score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
+        screen.blit(score, (350, 0))
+        
+        pygame.display.update()
+
     while run: 
 
         screen.fill((0, 0, 0))
@@ -732,7 +874,8 @@ while setup:
                 with open("leaderboard_data.txt", "w") as login_data_leaderboard:
                     json.dump(leaderboard_data, login_data_leaderboard)
             gameStart = 1
-            run = False                  
+            run = False
+            endscreen = True                  
 
         #Kolízia friends
         for i in range(numOfFriends):
@@ -794,7 +937,8 @@ while setup:
                 button_newgame = newgame2
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     print("newgame")
-                    run = True                    
+                    run = True
+                    endscreen = False             
                     start()
             elif mouse[0] not in range(282, 518) and mouse[1] not in range(210, 318):
                 button_newgame = newgame1
@@ -802,7 +946,6 @@ while setup:
             if mouse[0] in range(282, 518)  and mouse[1] in range(410, 518):
                 button_quit = quit2
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    run = False
                     pygame.quit()
             else:
                 button_quit = quit1
