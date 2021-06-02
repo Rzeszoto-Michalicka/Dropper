@@ -1070,7 +1070,8 @@ while setup:
                     json.dump(leaderboard_data, login_data_leaderboard)
             gameStart = 1
             run = False
-            endscreen = True                  
+            endscreen = True
+            mixer.music.stop()                 
 
         #Kolízia friends
         for i in range(numOfFriends):
