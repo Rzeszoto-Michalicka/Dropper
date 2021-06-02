@@ -48,7 +48,7 @@ pygame.display.set_icon(icon)
 heart1 = pygame.image.load('heart.png').convert_alpha()
 heart2 = pygame.image.load('heart.png').convert_alpha()
 heart3 = pygame.image.load('heart.png').convert_alpha()
-background = pygame.image.load('background.jpg').convert_alpha()
+background = pygame.image.load('endless_background.png').convert_alpha()
 playerIMG = pygame.image.load('player.png').convert_alpha()
 zero = pygame.image.load('0.png').convert_alpha()
 one = pygame.image.load('1.png').convert_alpha()
@@ -97,6 +97,24 @@ nuke = pygame.image.load("nuclear.png").convert_alpha()
 naruto = pygame.image.load("naruto.png").convert_alpha()
 tsunami = pygame.image.load("tsunami.png").convert_alpha()
 sushi = pygame.image.load("sushi.png").convert_alpha()
+level1_ul = pygame.image.load("level1.png").convert_alpha()
+#level1_l = pygame.image.load("level1_locked.png").convert_alpha()
+level2_ul = pygame.image.load("level2.png").convert_alpha()
+level2_l = pygame.image.load("level2_locked.png").convert_alpha()
+level3_ul = pygame.image.load("level3.png").convert_alpha()
+level3_l = pygame.image.load("level3_locked.png").convert_alpha()
+level4_ul = pygame.image.load("level4.png").convert_alpha()
+level4_l = pygame.image.load("level4_locked.png").convert_alpha()
+button_level1 = level1_ul
+button_level2 = level2_l
+button_level3 = level3_l
+button_level4 = level4_l
+apple = pygame.image.load("apple.png").convert_alpha()
+pear = pygame.image.load("pear.png").convert_alpha()
+hamburger = pygame.image.load("burger.png").convert_alpha()
+pizza = pygame.image.load("pizza.png").convert_alpha()
+restaurant = pygame.image.load("restaurant.png").convert_alpha()
+plate = pygame.image.load("bowl.png").convert_alpha()
 
 #Zvuky
 pygame.mixer.init()
@@ -176,7 +194,6 @@ def start():
     global setup
     global decision
 
-
     if gameStart == 1:
         #Hráč
         playerX = 370
@@ -188,7 +205,7 @@ def start():
 
         #Friend
         spawnFriend = [10, 110, 210, 310, 410, 510, 610, 710]
-        friendlyList = [zero, one, fish, shark, r2d2, yoda, naruto, sushi]
+        friendlyList = [zero, one, fish, shark, r2d2, yoda, naruto, sushi, apple, pear]
         friendlyIMG = []
         friendX = []
         friendYchange = []
@@ -218,14 +235,20 @@ def start():
         elif levelThree == True:
             friendlyIMG.append(friendlyList[(random.randrange(6,8))])
             friendX.append(random.choice(spawnFriend))
-            friendYchange.append(random.choice([0.2, 0.3]))
+            friendYchange.append(random.choice([0.3, 0.4]))
+            friendY.append(friendlySpawn)
+            friendlySpawn -= 300
+        elif levelFour == True:
+            friendlyIMG.append(friendlyList[(random.randrange(8,10))])
+            friendX.append(random.choice(spawnFriend))
+            friendYchange.append(random.choice([0.4, 0.5]))
             friendY.append(friendlySpawn)
             friendlySpawn -= 300
 
     if gameStart == 1:
         #Enemy
         spawnEnemy = [60, 160, 260, 360, 460, 560, 660, 650]
-        enemyList = [curlyL, curlyR, hashtag, bottle, oil, darth, storm, tsunami, nuke]
+        enemyList = [curlyL, curlyR, hashtag, bottle, oil, darth, storm, tsunami, nuke, hamburger, pizza]
         enemyIMG = []
         enemyX = []
         enemyYchange = []
@@ -255,7 +278,13 @@ def start():
         elif levelThree == True:
             enemyIMG.append(enemyList[(random.randrange(7,9))])
             enemyX.append(random.choice(spawnEnemy))
-            enemyYchange.append(random.choice([0.2, 0.3]))
+            enemyYchange.append(random.choice([0.3, 0.4]))
+            enemyY.append(enemySpawn)
+            enemySpawn -= 300
+        elif levelFour == True:
+            enemyIMG.append(enemyList[(random.randrange(9,11))])
+            enemyX.append(random.choice(spawnEnemy))
+            enemyYchange.append(random.choice([0.4, 0.5]))
             enemyY.append(enemySpawn)
             enemySpawn -= 300
 
@@ -270,7 +299,9 @@ setup = True
 levelOne = False
 levelTwo = False
 levelThree = False
+levelFour = False
 endscreen = False
+levels = False
 
 while menu:
     
@@ -322,7 +353,7 @@ while menu:
     input_rect.w = max(100, text_surface.get_width()+10)
     
     pygame.display.update()  
-
+time.sleep(0.2)
 while setup:
 
     while decision:
@@ -349,21 +380,10 @@ while setup:
 
         if mouse[0] in range(150, 350) and mouse[1] in range(200,400):
             button_levels = levels1
-            if event.type == pygame.MOUSEBUTTONDOWN and level == 1:
-                levelOne = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 decision = False
-                leaderboard = False
-                run = False
-            if event.type == pygame.MOUSEBUTTONDOWN and level == 2:
-                levelTwo = True
-                decision = False
-                leaderboard = False
-                run = False
-            if event.type == pygame.MOUSEBUTTONDOWN and level == 3:
-                levelThree = True
-                decision = False
-                leaderboard = False
-                run = False
+                levels = True
+                
         else:
             button_levels = levels2 
 
@@ -377,7 +397,7 @@ while setup:
             button_leaderboard = leaderboard2 
 
         pygame.display.update()
-    time.sleep(0.1)
+    time.sleep(0.13)
     while leaderboard:
         #Leaderboard
         Login_best = collections.namedtuple('Login_best', 'score name')
@@ -436,8 +456,8 @@ while setup:
                 label = font.render(str(login_best.score), True, (color))
                 screen.blit(label, (350, 190+i*65))
             except:
-                break
                 color = (255, 255, 255)
+                break
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 with open("login_data.txt", "w") as login_data_write:
@@ -449,16 +469,62 @@ while setup:
             if event.type == pygame.MOUSEBUTTONDOWN: 
                 leaderboard = False 
                 decision = True
-                time.sleep(0.1)    
+                time.sleep(0.13)    
         else:
             button_back = back2 
         pygame.display.update()
 
-    if run:    
-        pygame.mixer.music.play(-1)
-    
-    while levelOne:
+    while levels == True:
+        if level >= 4:
+            button_level4 = level4_ul
+        if level >= 3:
+            button_level3 = level3_ul
+        if level >= 2:
+            button_level2 = level2_ul
         
+        mouse = pygame.mouse.get_pos()
+        screen.fill((0, 0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                with open("login_data.txt", "w") as login_data_write:
+                    json.dump(login_data,login_data_write)
+                pygame.quit()
+        level = int(login_data[str(user_text)])
+        screen.blit(end, (0, 0))
+        screen.blit(button_level1, (210,160))
+        screen.blit(button_level2, (510,160))
+        screen.blit(button_level3, (210,360))
+        screen.blit(button_level4, (510,360))
+        screen.blit(button_back, (300,450))
+        if mouse[0] in range(300, 500) and mouse[1] in range(450,650):
+            button_back = back1  
+            if event.type == pygame.MOUSEBUTTONDOWN: 
+                levels = False 
+                decision = True
+                time.sleep(0.13)
+        else:
+            button_back = back2
+        if mouse[0] in range(210, 290) and mouse[1] in range(160,240) and event.type == pygame.MOUSEBUTTONDOWN and level >= 1 :
+            levelOne = True
+            levels = False
+            run = False
+        if mouse[0] in range(510, 590) and mouse[1] in range(160,240) and event.type == pygame.MOUSEBUTTONDOWN and level >= 2 :
+            levelTwo = True
+            levels = False
+            run = False
+        if mouse[0] in range(210, 290) and mouse[1] in range(360,440) and event.type == pygame.MOUSEBUTTONDOWN and level >= 3 :
+            levelThree = True
+            levels = False
+            run = False
+        if mouse[0] in range(510, 590) and mouse[1] in range(360,440) and event.type == pygame.MOUSEBUTTONDOWN and level >= 4 :
+            levelFour = True
+            levels = False
+            run = False
+            
+        pygame.display.update()
+
+    while levelOne:
+        numOfEnemies = 0
         run = False
         screen.fill((0, 0, 0))
 
@@ -483,12 +549,15 @@ while setup:
             start()
         if gameStart == 2:
             if score_value >= 10:
-                level = 2
+                if level < 2:
+                    level = 2
                 login_data[user_text] = level
+                levels = True
+                levelOne = False
+                score_value = 0
+                run = False
                 with open("login_data.txt", "w") as login_data_login:
                     json.dump(login_data, login_data_login)
-                decision = True
-                levelOne = False
             start()    
         
         #Friend pohyb
@@ -522,9 +591,8 @@ while setup:
                     json.dump(leaderboard_data, login_data_leaderboard)
             gameStart = 1
             levelOne = False
-            endscreen = True
-
-
+            levels = True
+            score_value = 0
 
         #Kolízia friends
         for i in range(numOfFriends):
@@ -576,7 +644,7 @@ while setup:
         pygame.display.update()
     
     while levelTwo:
-    
+        numOfEnemies = 2 
         run = False
         screen.fill((0, 0, 0))
 
@@ -601,12 +669,15 @@ while setup:
             start()
         if gameStart == 2:
             if score_value >= 10:
-                level = 3
+                if level < 3:
+                    level = 3
                 login_data[user_text] = level
+                levels = True
+                levelTwo = False
+                score_value = 0
+                run = False
                 with open("login_data.txt", "w") as login_data_login:
                     json.dump(login_data, login_data_login)
-                decision = True
-                levelTwo = False
             start()    
         
         #Friend pohyb
@@ -640,9 +711,8 @@ while setup:
                     json.dump(leaderboard_data, login_data_leaderboard)
             gameStart = 1
             levelTwo = False
-            decision = True
-            endscreen = True
-
+            levels = True
+            score_value = 0
 
 
         #Kolízia friends
@@ -695,7 +765,7 @@ while setup:
         pygame.display.update()
 
     while levelThree:
-    
+        numOfEnemies = 3
         run = False
         screen.fill((0, 0, 0))
 
@@ -716,16 +786,19 @@ while setup:
                 playerXchange = 0
 
         if gameStart == 1:
-            numOfEnemies = 1
+            numOfEnemies = 3
             start()
         if gameStart == 2:
-            if score_value >= 10:
-                level = 4
+            if score_value >= 15:
+                if level < 4:
+                    level = 4
                 login_data[user_text] = level
+                levels = True
+                levelThree = False
+                score_value = 0
+                run = False
                 with open("login_data.txt", "w") as login_data_login:
                     json.dump(login_data, login_data_login)
-                decision = True
-                levelThree = False
             start()    
         
         #Friend pohyb
@@ -759,8 +832,8 @@ while setup:
                     json.dump(leaderboard_data, login_data_leaderboard)
             gameStart = 1
             levelThree = False
-            decision = True
-
+            levels = True
+            score_value = 0
 
 
         #Kolízia friends
@@ -812,10 +885,132 @@ while setup:
         
         pygame.display.update()
 
-    while run: 
-
+    while levelFour:
+        numOfEnemies = 4
+        run = False
         screen.fill((0, 0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                with open("login_data.txt", "w") as login_data_write:
+                    json.dump(login_data,login_data_write)
+                pygame.quit()
         
+        #Pohyb
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                    playerXchange = -1
+            if event.key == pygame.K_RIGHT:
+                    playerXchange = +1
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                playerXchange = 0
+
+        if gameStart == 1:
+            numOfEnemies = 4
+            start()
+        if gameStart == 2:
+            if score_value >= 20:
+                if level < 4:
+                    level = 4
+                login_data[user_text] = level
+                levels = True
+                levelFour = False
+                score_value = 0
+                run = False
+                with open("login_data.txt", "w") as login_data_login:
+                    json.dump(login_data, login_data_login)
+            start()    
+        
+        #Friend pohyb
+        for i in range(numOfFriends):
+            friendY[i] += friendYchange[i]
+        
+        #Enemy pohyb
+        for j in range(numOfEnemies):
+            enemyY[j] += enemyYchange[j]
+        
+        screen.blit(restaurant, (0,0))
+        
+        if lives == 3:
+            screen.blit(heart1, (750, 0))
+            screen.blit(heart2, (715, 0))
+            screen.blit(heart3, (680, 0))
+        elif lives == 2:
+            screen.blit(heart1, (750, 0))
+            screen.blit(heart2, (715, 0))
+        elif lives == 1:
+            screen.blit(heart1, (750, 0))
+        elif lives < 1:
+            try:
+                if leaderboard_data[user_text] < score_value:
+                    leaderboard_data[user_text] = score_value
+                    with open("leaderboard_data.txt", "w") as login_data_leaderboard:
+                        json.dump(leaderboard_data, login_data_leaderboard)
+            except:
+                leaderboard_data[user_text] = score_value
+                with open("leaderboard_data.txt", "w") as login_data_leaderboard:
+                    json.dump(leaderboard_data, login_data_leaderboard)
+            gameStart = 1
+            levelFour = False
+            levels = True
+            score_value = 0
+
+
+
+        #Kolízia friends
+        for i in range(numOfFriends):
+            
+            collisionFriends = isCollisionFriends(playerY, friendY, friendX)
+            if collisionFriends == True:
+                friendX[i] = (random.choice(spawnFriend))
+                friendY[i] = 0
+                score_value += 1
+                print("boom")
+                friendlyIMG[i] = friendlyList[(random.randrange(8, 10))]
+            if collisionFriends == False:
+                friendX[i] = (random.choice(spawnFriend))
+                friendY[i] = 0
+                lives -= 1
+                print("vedla")
+                friendlyIMG[i] = friendlyList[(random.randrange(8, 10))]
+
+        #Kolízia enemies
+        for j in range(numOfEnemies):
+            
+            collisionEnemy = isCollisionEnemy(playerY, enemyY, enemyX)
+            if collisionEnemy == True:
+                enemyX[j] = (random.choice(spawnEnemy))
+                enemyY[j] = 0
+                lives -= 1
+                print("zasah")
+                enemyIMG[j] = enemyList[(random.randrange(9, 11))]
+            if collisionEnemy == False:
+                enemyX[j] = (random.choice(spawnEnemy))
+                enemyY[j] = 0            
+                enemyIMG[j] = enemyList[(random.randrange(9, 11))]
+
+
+        playerX += playerXchange
+        for i in range(numOfFriends):
+            friend(friendX[i], friendY[i])
+        for j in range(numOfEnemies):
+            enemy(enemyX[j], enemyY[j])
+        player(playerX, playerY, plate)
+        if playerX <= 0:
+            playerX = 0
+        elif playerX >= 736:
+            playerX = 736
+
+        score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
+        screen.blit(score, (350, 0))
+        pygame.display.update()
+
+    if run:    
+        pygame.mixer.music.play(-1)
+
+    while run: 
+        screen.fill((0, 0, 0))
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
