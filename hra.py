@@ -640,6 +640,8 @@ while setup:
         elif playerX >= 736:
             playerX = 736
 
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        base_font = pygame.font.Font(None, 32)
         score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
         screen.blit(score, (350, 0))
         
@@ -763,6 +765,8 @@ while setup:
         elif playerX >= 736:
             playerX = 736
 
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        base_font = pygame.font.Font(None, 32)
         score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
         screen.blit(score, (350, 0))
         
@@ -885,6 +889,8 @@ while setup:
         elif playerX >= 707:
             playerX = 707
 
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        base_font = pygame.font.Font(None, 32)
         score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
         screen.blit(score, (350, 0))
         
@@ -1008,7 +1014,8 @@ while setup:
             playerX = 0
         elif playerX >= 736:
             playerX = 736
-
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        base_font = pygame.font.Font(None, 32)
         score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
         screen.blit(score, (350, 0))
         pygame.display.update()
@@ -1124,7 +1131,9 @@ while setup:
         elif playerX >= 736:
             playerX = 736
 
-        score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        base_font = pygame.font.Font(None, 32)
+        score = font.render("Skóre : " + str(score_value), True, (255, 255, 255))
         screen.blit(score, (350, 0))
 
 
