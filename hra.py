@@ -129,7 +129,7 @@ base_font = pygame.font.Font(None, 32)
 user_text = ''
 input_rect = pygame.Rect(345, 200, 140, 32)
 color_active = pygame.Color('lightskyblue3')
-color_passive = pygame.Color('lightblue4')#chartreuse4
+color_passive = pygame.Color('chartreuse4')
 color = color_passive
 
 #Hráč
@@ -551,6 +551,7 @@ while setup:
             if score_value >= 10:
                 if level < 2:
                     level = 2
+                gameStart = 1
                 login_data[user_text] = level
                 levels = True
                 levelOne = False
@@ -558,6 +559,7 @@ while setup:
                 run = False
                 with open("login_data.txt", "w") as login_data_login:
                     json.dump(login_data, login_data_login)
+                break
             start()    
         
         #Friend pohyb
@@ -671,6 +673,7 @@ while setup:
             if score_value >= 10:
                 if level < 3:
                     level = 3
+                gameStart = 1
                 login_data[user_text] = level
                 levels = True
                 levelTwo = False
@@ -678,7 +681,8 @@ while setup:
                 run = False
                 with open("login_data.txt", "w") as login_data_login:
                     json.dump(login_data, login_data_login)
-            start()    
+                break
+            start()   
         
         #Friend pohyb
         for i in range(numOfFriends):
@@ -765,7 +769,9 @@ while setup:
         pygame.display.update()
 
     while levelThree:
-        numOfEnemies = 3
+        if gameStart == 1:
+            numOfEnemies = 3
+            start()
         run = False
         screen.fill((0, 0, 0))
 
@@ -785,13 +791,11 @@ while setup:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 playerXchange = 0
 
-        if gameStart == 1:
-            numOfEnemies = 3
-            start()
         if gameStart == 2:
             if score_value >= 15:
                 if level < 4:
                     level = 4
+                gameStart = 1
                 login_data[user_text] = level
                 levels = True
                 levelThree = False
@@ -799,6 +803,7 @@ while setup:
                 run = False
                 with open("login_data.txt", "w") as login_data_login:
                     json.dump(login_data, login_data_login)
+                break
             start()    
         
         #Friend pohyb
@@ -877,8 +882,8 @@ while setup:
         player(playerX, playerY, flag)
         if playerX <= 0:
             playerX = 0
-        elif playerX >= 736:
-            playerX = 736
+        elif playerX >= 707:
+            playerX = 707
 
         score = font.render("Skóre : " + str(score_value), True, (58, 47, 214))
         screen.blit(score, (350, 0))
@@ -913,6 +918,7 @@ while setup:
             if score_value >= 20:
                 if level < 4:
                     level = 4
+                    gameStart = 1
                 login_data[user_text] = level
                 levels = True
                 levelFour = False
@@ -920,6 +926,7 @@ while setup:
                 run = False
                 with open("login_data.txt", "w") as login_data_login:
                     json.dump(login_data, login_data_login)
+                break
             start()    
         
         #Friend pohyb
@@ -1070,7 +1077,7 @@ while setup:
                     json.dump(leaderboard_data, login_data_leaderboard)
             gameStart = 1
             run = False
-            decision = True
+            endscreen = True
             mixer.music.stop()                 
 
         #Kolízia friends
